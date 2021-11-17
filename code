@@ -1,0 +1,52 @@
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+#define SERVOMIN  140
+#define SERVOMAX  520
+#define XJOY_PIN A1
+#define YJOY_PIN A3
+
+uint8_t servonum = 0;
+int sensorPin = A0;
+int sensorValue = 0;
+
+void setup()
+{  pinMode(A0,INPUT);
+   Serial.begin(9600);
+   pinMode (XJOY_PIN, INPUT);
+   pinMode (YJOY_PIN, INPUT);
+ 
+  pwm.begin();
+   pwm.setOscillatorFrequency(27000000);
+  pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
+}
+
+void loop()
+{
+ {int joystickXValinput= analogRead(XJOY_PIN); 
+ int joystickXVal = map(joystickXValinput,0,1018,150,360);
+ int joystickYValinput= analogRead(YJOY_PIN); 
+ int joystickYVal = map(joystickYValinput,0,1018,150,470);
+
+  delay(10);
+  //left eye
+  pwm.setPWM(0, 0, joystickXVal);
+  pwm.setPWM(1, 0, joystickYVal);
+  delay(10);
+   
+  //right eye
+  pwm.setPWM(2, 0, joystickXVal);
+  pwm.setPWM(3, 0, joystickYVal); 
+  
+  sensorValue = analogRead(sensorPin);
+  Serial.println(sensorValue);
+  if (analogRead(sensorPin) == 1023) 
+  pwm.setPWM (4, 0, 540), pwm.setPWM (5, 0, 220);
+  else
+  pwm.setPWM (4, 0, 220), pwm.setPWM (5, 0, 540);
+ }
+ 
+{Serial.println(sensorValue);}
+ 
+}
